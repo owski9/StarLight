@@ -8,9 +8,9 @@ iframe.id = "iframeWindow";
 
 window.onload = async function () {
   let connection = new BareMux.BareMuxConnection("/b/worker.js");
-  let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/w/";
-	if (await connection.getTransport() !== "/e/index.mjs") {
-		await connection.setTransport("/e/index.mjs", [{ wisp: wispUrl }]);
+  let bareUrl = (location.protocol === "https:" ? "https" : "http") + "://" + location.host + "/bs/";
+	if (await connection.getTransport() !== "/bm/index.mjs") {
+		await connection.setTransport("/bm/index.mjs", [bareUrl]);
 	}
   const encUrl = localStorage.getItem("Iframe");
   iframe.src = encUrl;

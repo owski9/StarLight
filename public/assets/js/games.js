@@ -1,6 +1,6 @@
 window.addEventListener("load", () => {
   navigator.serviceWorker
-    .register("./sw.js?v=1")
+    .register("./sw.js?v=2")
     .then(() => {
       navigator.serviceWorker.ready.then(() => {
         console.log("Successfully Registered Service Workers");

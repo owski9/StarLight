@@ -1,15 +1,16 @@
-import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
+import { bareModulePath } from "@mercuryworkshop/bare-as-module3";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
+import { createBareServer } from "@tomphttp/bare-server-node";
 import http from "node:http";
 import express from "express";
 import basicAuth from "express-basic-auth";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pass from "./p.js";
-import wisp from "wisp-server-node"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, "..");
+const bare = createBareServer("/bs/");
 const maindir = "public"; // Change this to the folder with the files in it
 const app = express();
 
@@ -22,7 +23,8 @@ if (pass.challenge) {
     }),
   );
 }
-app.use("/e/", express.static(epoxyPath));
+
+app.use("/bm/", express.static(bareModulePath));
 app.use("/b/", express.static(baremuxPath));
 app.use(
   express.static(join(__dirname, maindir), {
@@ -52,14 +54,19 @@ app.use((req, res) => {
 });
 
 const server = http.createServer((req, res) => {
+  if (bare.shouldRoute(req)) {
+    bare.routeRequest(req, res);
+  } else {
     app(req, res);
+  }
 });
 
 server.on("upgrade", (req, socket, head) => {
-  if (req.url.endsWith("/w/"))
-    wisp.routeRequest(req, socket, head);
-  else
+  if (bare.shouldRoute(req)) {
+    bare.routeUpgrade(req, socket, head);
+  } else {
     socket.end();
+  }
 });
 
 let port = parseInt(process.env.PORT || "", 10);
